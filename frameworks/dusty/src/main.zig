@@ -125,8 +125,10 @@ fn jsonItems(req: *http.Request, res: *http.Response) !void {
         var stream_buf: [4096]u8 = undefined;
         var body = try res.stream(&stream_buf);
 
-        const window = try req.arena.alloc(u8, flate.max_window_len);
-        var compressor = try flate.Compress.init(&body.interface, window, .gzip, .fastest);
+        // On the stack, next to the compressor: from the request arena, a new
+        // connection's first gzip response grew the arena by the whole window.
+        var window: [flate.max_window_len]u8 = undefined;
+        var compressor = try flate.Compress.init(&body.interface, &window, .gzip, .fastest);
         try json.encode(payload, &compressor.writer);
         try compressor.finish();
         try body.end();
