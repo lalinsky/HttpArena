@@ -86,7 +86,10 @@ fn asyncDb(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
         "SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count FROM items WHERE price BETWEEN $1 AND $2 LIMIT $3",
         .{ min, max, limit },
         .{ .cache_name = "async_db" },
-    ) catch return res.json(empty_db_response, .{});
+    ) catch |err| {
+        std.log.err("async-db query: {}", .{err});
+        return res.json(empty_db_response, .{});
+    };
     defer result.deinit();
 
     var items: std.ArrayList(DbItem) = .empty;
@@ -133,7 +136,10 @@ pub fn main(init: std.process.Init) !void {
         app.pool = pg.Pool.initUri(io, allocator, uri, .{
             .size = max_conn,
             .connect_on_init_count = 1,
-        }) catch null;
+        }) catch |err| blk: {
+            std.log.err("connecting to Postgres: {}", .{err});
+            break :blk null;
+        };
     }
 
     const cpus: u16 = @intCast(std.Thread.getCpuCount() catch 1);
