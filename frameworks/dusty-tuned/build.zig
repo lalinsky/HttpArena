@@ -8,7 +8,7 @@ pub fn build(b: *std.Build) void {
     const dusty_dep = b.dependency("dusty", .{
         .target = target,
         .optimize = optimize,
-        .use_brotli = b.option(bool, "use_brotli", "Compress with brotli") orelse true,
+        .use_brotli = b.option(bool, "use_brotli", "Compress with brotli") orelse false,
     });
     const dusty_mod = dusty_dep.module("dusty");
 
