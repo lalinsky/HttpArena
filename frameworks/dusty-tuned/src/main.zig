@@ -261,6 +261,7 @@ const Tuning = struct {
 
 pub fn main(init: std.process.Init) !void {
     const tuning: Tuning = .fromEnv(init.environ_map);
+    if (Tuning.envInt(init.environ_map, c_int, "BROTLI_QUALITY")) |q| http.Response.brotli_quality = q;
 
     loadDataset(init.arena.allocator(), init.io);
 

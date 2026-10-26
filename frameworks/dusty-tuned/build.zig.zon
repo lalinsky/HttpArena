@@ -10,8 +10,8 @@
     },
     .dependencies = .{
         .dusty = .{
-            .url = "git+https://github.com/lalinsky/dusty?ref=v0.5.0#48196c2d81f6cc54f6483b87f56cf808a9d7ba56",
-            .hash = "dusty-0.5.0-Qdw7RuwFJAAvz4m-QiYLfUnjj0_91imaCApFQXcDyt1p",
+            .url = "git+https://github.com/lalinsky/dusty#841b19857a3d3aab6650ef52c5aa59c064a1aea5",
+            .hash = "dusty-0.5.0-Qdw7RpoVJACBCJ6XeXNzRiysT-rwbnY0g5CiDrihiJrm",
         },
         .zio = .{
             .url = "git+https://github.com/lalinsky/zio#32bbf047aac8b1fa7e49dc1a79ae8082b4a1b33a",
