@@ -220,11 +220,12 @@ fn echoBody(req: *http.Request, res: *http.Response) !void {
 /// What the entry tunes, read from the environment while the settings are
 /// being explored.
 const Tuning = struct {
-    /// Zero runs one runtime over `executors` threads. N runs N runtimes of
-    /// one executor each, every one with its own server on the same ports,
-    /// the kernel spreading connections over them with SO_REUSEPORT.
+    /// Zero runs one runtime. N runs N runtimes, every one with its own
+    /// server on the same ports, the kernel spreading connections over them
+    /// with SO_REUSEPORT.
     runtimes: usize = 0,
-    /// Executors of the single runtime; zero is one per CPU.
+    /// Executors per runtime; zero is one per CPU for a single runtime and
+    /// one for each of N.
     executors: u8 = 0,
     acceptors: ?u16 = null,
     kernel_backlog: ?u31 = null,
@@ -268,17 +269,18 @@ pub fn main(init: std.process.Init) !void {
         return serve(init.gpa, &tuning, executors, tuning.db_max_conn);
     }
 
+    const per_runtime: @FieldType(zio.RuntimeOptions, "executors") = if (tuning.executors == 0) .exact(1) else .exact(tuning.executors);
     const per_runtime_db: u16 = @intCast(@max(1, tuning.db_max_conn / tuning.runtimes));
     const threads = try init.gpa.alloc(std.Thread, tuning.runtimes - 1);
     for (threads) |*t| {
-        t.* = try std.Thread.spawn(.{}, serveThread, .{ init.gpa, &tuning, per_runtime_db });
+        t.* = try std.Thread.spawn(.{}, serveThread, .{ init.gpa, &tuning, per_runtime, per_runtime_db });
     }
-    serveThread(init.gpa, &tuning, per_runtime_db);
+    serveThread(init.gpa, &tuning, per_runtime, per_runtime_db);
     for (threads) |t| t.join();
 }
 
-fn serveThread(gpa: std.mem.Allocator, tuning: *const Tuning, db_max_conn: u16) void {
-    serve(gpa, tuning, .exact(1), db_max_conn) catch |err| {
+fn serveThread(gpa: std.mem.Allocator, tuning: *const Tuning, executors: @FieldType(zio.RuntimeOptions, "executors"), db_max_conn: u16) void {
+    serve(gpa, tuning, executors, db_max_conn) catch |err| {
         std.debug.print("runtime failed: {}\n", .{err});
         std.process.exit(1);
     };
