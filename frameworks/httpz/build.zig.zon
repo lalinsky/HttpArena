@@ -1,0 +1,21 @@
+.{
+    .name = .httpz_arena,
+    .version = "0.1.0",
+    .fingerprint = 0x205efdbb9cff294e,
+    .minimum_zig_version = "0.17.0",
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+    .dependencies = .{
+        .httpz = .{
+            .url = "git+https://github.com/karlseguin/http.zig#5b81bded629f7ce16db3ad3f1a76bddca5560096",
+            .hash = "httpz-0.0.0-PNVzrEg0CQD-n7jqECTtPVfTxog5lp6bOCc0fQggnJ5t",
+        },
+        .pg = .{
+            .url = "git+https://github.com/karlseguin/pg.zig#0ccd7d9dabce32e4cee0dd789d8007934099a0f9",
+            .hash = "pg-0.0.0-Wp_7geJVBwDaf2o8erlmelEP5RBEuMESnFWWrNLQneEy",
+        },
+    },
+}

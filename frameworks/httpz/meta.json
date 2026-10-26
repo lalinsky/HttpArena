@@ -1,0 +1,26 @@
+{
+  "display_name": "httpz",
+  "language": "Zig",
+  "type": "emerging",
+  "mode": "standard",
+  "completeness": {
+    "routing": true,
+    "middleware": true,
+    "request": true,
+    "response": true
+  },
+  "engine": "httpz",
+  "description": "http.zig (httpz), Karl Seguin's HTTP/1.1 server for Zig, default configuration: epoll workers that read and parse requests, a thread pool that runs the handlers, both sized to the CPU count. Routing, query parsing and res.json through the httpz API, WebSocket through its websocket.zig integration, Postgres through pg.zig. httpz has no TLS or response compression, so the TLS and json-comp profiles are not run.",
+  "repo": "https://github.com/karlseguin/http.zig",
+  "enabled": true,
+  "tests": [
+    "baseline", "latency-1m", "latency-10k", "latency-500k-8cpu",
+    "pipelined",
+    "limited-conn",
+    "async-db",
+    "echo-ws", "echo-ws-pipeline", "echo-ws-limited"
+  ],
+  "maintainers": [
+    "lalinsky"
+  ]
+}
