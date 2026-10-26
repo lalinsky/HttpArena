@@ -232,6 +232,12 @@ const Tuning = struct {
     timeouts: bool = true,
     buffer_size: usize = 16384,
     write_buffer_size: usize = 16384,
+    /// zio's stack pool: never shrink, stacks committed up front,
+    /// committed bytes per stack, stacks per slab.
+    stack_shrink: bool = true,
+    stack_prewarm: usize = 0,
+    stack_committed: usize = 256 * 1024,
+    stack_slab_slots: usize = 64,
     db_url: ?[]const u8 = null,
     db_max_conn: u16 = 256,
     cert_path: []const u8 = "/certs/server.crt",
@@ -246,6 +252,10 @@ const Tuning = struct {
         if (env.get("NO_TIMEOUTS")) |v| t.timeouts = std.mem.eql(u8, v, "0");
         t.buffer_size = envInt(env, usize, "BUFFER_SIZE") orelse t.buffer_size;
         t.write_buffer_size = envInt(env, usize, "WRITE_BUFFER_SIZE") orelse t.write_buffer_size;
+        if (env.get("STACK_NO_SHRINK")) |v| t.stack_shrink = std.mem.eql(u8, v, "0");
+        t.stack_prewarm = envInt(env, usize, "STACK_PREWARM") orelse t.stack_prewarm;
+        t.stack_committed = envInt(env, usize, "STACK_COMMITTED") orelse t.stack_committed;
+        t.stack_slab_slots = envInt(env, usize, "STACK_SLAB_SLOTS") orelse t.stack_slab_slots;
         t.db_url = env.get("DATABASE_URL");
         t.db_max_conn = envInt(env, u16, "DATABASE_MAX_CONN") orelse t.db_max_conn;
         t.cert_path = env.get("TLS_CERT") orelse t.cert_path;
@@ -288,7 +298,16 @@ fn serveThread(gpa: std.mem.Allocator, tuning: *const Tuning, executors: @FieldT
 }
 
 fn serve(gpa: std.mem.Allocator, tuning: *const Tuning, executors: @FieldType(zio.RuntimeOptions, "executors"), db_max_conn: u16) !void {
-    var rt = try zio.Runtime.init(gpa, .{ .executors = executors });
+    var rt = try zio.Runtime.init(gpa, .{
+        .executors = executors,
+        .stack_pool = .{
+            .maximum_size = 8 * 1024 * 1024,
+            .committed_size = tuning.stack_committed,
+            .shrink_interval = if (tuning.stack_shrink) .fromSeconds(60) else .zero,
+            .slab_slots = tuning.stack_slab_slots,
+            .prewarm = tuning.stack_prewarm,
+        },
+    });
     defer rt.deinit();
 
     if (tuning.db_url) |url| {
