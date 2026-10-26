@@ -1,6 +1,7 @@
 FROM alpine:3.20 AS build
 ARG TARGETARCH
 ARG ZIG_VERSION=0.17.0
+ARG ZIG_FLAGS=""
 RUN apk add --no-cache ca-certificates curl git tar xz
 
 WORKDIR /server
@@ -26,7 +27,7 @@ RUN set -eu; \
     zig build \
         -Dtarget="${ZIG_TARGET}" \
         -Dcpu="${ZIG_CPU}" \
-        --release=fast --summary failures
+        --release=fast --summary failures ${ZIG_FLAGS}
 
 FROM alpine:3.20
 COPY --from=build /server/zig-out/bin/dusty-arena /dusty-arena

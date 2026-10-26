@@ -14,6 +14,8 @@ pub fn build(b: *std.Build) void {
     const zio_dep = b.dependency("zio", .{
         .target = target,
         .optimize = optimize,
+        .backend = b.option(enum { io_uring, epoll }, "zio_backend", "zio's event loop backend"),
+        .scheduler_metrics = b.option(bool, "zio_scheduler_metrics", "Count zio scheduler events"),
     });
     const zio_mod = zio_dep.module("zio");
 
