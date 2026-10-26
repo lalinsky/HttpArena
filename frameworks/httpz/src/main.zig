@@ -122,6 +122,11 @@ fn wsEcho(_: *App, req: *httpz.Request, res: *httpz.Response) !void {
     }
 }
 
+fn envCount(env: *std.process.Environ.Map, name: []const u8) ?u16 {
+    const value = env.get(name) orelse return null;
+    return std.fmt.parseInt(u16, value, 10) catch null;
+}
+
 pub fn main(init: std.process.Init) !void {
     const io = init.io;
     const allocator = init.gpa;
@@ -145,8 +150,8 @@ pub fn main(init: std.process.Init) !void {
     const cpus: u16 = @intCast(std.Thread.getCpuCount() catch 1);
     var server = try httpz.Server(*App).init(io, allocator, .{
         .address = .all(8080),
-        .workers = .{ .count = cpus },
-        .thread_pool = .{ .count = cpus },
+        .workers = .{ .count = envCount(init.environ_map, "HTTPZ_WORKERS") orelse cpus },
+        .thread_pool = .{ .count = envCount(init.environ_map, "HTTPZ_THREADS") orelse cpus },
     }, &app);
     defer {
         server.stop();
