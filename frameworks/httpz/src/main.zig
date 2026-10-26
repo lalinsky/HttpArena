@@ -135,7 +135,7 @@ pub fn main(init: std.process.Init) !void {
             256;
         app.pool = pg.Pool.initUri(io, allocator, uri, .{
             .size = max_conn,
-            .connect_on_init_count = 1,
+            .connect_on_init_count = 0,
         }) catch |err| blk: {
             std.log.err("connecting to Postgres: {}", .{err});
             break :blk null;
