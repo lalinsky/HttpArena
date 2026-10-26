@@ -20,6 +20,7 @@ pub fn build(b: *std.Build) void {
         .overflow_busy_take = b.option(u32, "zio_overflow_busy_take", "Overflow tasks a busy executor takes per tick, 0 = fair share"),
         .overflow_interval = b.option(u32, "zio_overflow_interval", "Run one overflow task every N quanta, 0 = off"),
         .tick_target_us = b.option(u32, "zio_tick_target_us", "Task time per tick before polling I/O"),
+        .min_tick_budget = b.option(u32, "zio_min_tick_budget", "Lowest tick budget"),
     });
     const zio_mod = zio_dep.module("zio");
 
