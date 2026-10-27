@@ -17,10 +17,7 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
         .backend = b.option(enum { io_uring, epoll }, "zio_backend", "zio's event loop backend"),
         .scheduler_metrics = b.option(bool, "zio_scheduler_metrics", "Count zio scheduler events"),
-        .overflow_busy_take = b.option(u32, "zio_overflow_busy_take", "Overflow tasks a busy executor takes per tick, 0 = fair share"),
-        .overflow_interval = b.option(u32, "zio_overflow_interval", "Run one overflow task every N quanta, 0 = off"),
-        .tick_target_us = b.option(u32, "zio_tick_target_us", "Task time per tick before polling I/O"),
-        .min_tick_budget = b.option(u32, "zio_min_tick_budget", "Lowest tick budget"),
+        .timer_wheel = b.option(bool, "zio_timer_wheel", "Keep timers in a wheel instead of a pairing heap"),
     });
     const zio_mod = zio_dep.module("zio");
 
@@ -50,7 +47,7 @@ pub fn build(b: *std.Build) void {
             .root_source_file = b.path("src/main.zig"),
             .target = target,
             .optimize = optimize,
-            .strip = true,
+            .strip = false,
         }),
     });
     exe.root_module.addImport("dusty", dusty_mod);
