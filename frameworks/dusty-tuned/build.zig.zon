@@ -14,8 +14,8 @@
             .hash = "dusty-0.5.0-Qdw7RpoVJACBCJ6XeXNzRiysT-rwbnY0g5CiDrihiJrm",
         },
         .zio = .{
-            .url = "git+https://github.com/lalinsky/zio#4ff91312acb8cad2d0cea4b84bad9030a538fd51",
-            .hash = "zio-0.19.0-xHbVVKHwLQD2bFMCuLi8ck0qPkw8Bogjq6iPJDfo3ceC",
+            .url = "git+https://github.com/lalinsky/zio#4c21779c60074e24abd93ebb1f36f630422b47e4",
+            .hash = "zio-0.19.0-xHbVVIwBLgDMd-JTQ-eBskBt4isUPi77dhsBYvvFuAtV",
         },
         .json = .{
             .url = "git+https://github.com/lalinsky/json.zig?ref=v0.2.0#9d3d4d951507a73732ae2f49275ad8fefd4a3cf8",

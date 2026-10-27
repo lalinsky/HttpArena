@@ -18,6 +18,8 @@ pub fn build(b: *std.Build) void {
         .backend = b.option(enum { io_uring, epoll }, "zio_backend", "zio's event loop backend"),
         .scheduler_metrics = b.option(bool, "zio_scheduler_metrics", "Count zio scheduler events"),
         .timer_wheel = b.option(bool, "zio_timer_wheel", "Keep timers in a wheel instead of a pairing heap"),
+        .timer_wheel_coarse = b.option(bool, "zio_timer_wheel_coarse", "Fire whole wheel slots once they end"),
+        .timer_wheel_shift = b.option(u6, "zio_timer_wheel_shift", "Wheel slots are 2^shift ns"),
     });
     const zio_mod = zio_dep.module("zio");
 
